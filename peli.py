@@ -4,14 +4,20 @@ import sys
 import random
 import threading
 
+pygame.init()
 pygame.font.init()
+pygame.mixer.init()
+
 taustakuva = pygame.image.load("bg.png")
 ufo = pygame.transform.scale(pygame.image.load("ufo.png"),(100,100))
 WIDTH, HEIGHT = 700, 700
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
+spawnevent = pygame.USEREVENT + 1
 clock = pygame.time.Clock()
 pygame.display.set_caption("Testipeli")
 miinat = []
+
+osuma = pygame.mixer.Sound("hit.wav")
 
 
 class Pelaaja:
@@ -39,33 +45,36 @@ def main():
             pygame.draw.rect(WIN,(255,0,0),miina)
     def handle(pelaaja):
         for miina in miinat:
-            if pelaaja.colliderect(miina):                                                               
+            if pelaaja.colliderect(miina):
+                osuma.play()
                 pelaaja1.health = pelaaja1.health - 5
                 miinat.remove(miina)
-                print(pelaaja1.health)
-    def uusimiina():
-            miina = pygame.Rect(randomWitdh,randomHeight, 50,50)
-            miinat.append(miina)
+    start = pygame.time.get_ticks()
+    pygame.time.set_timer(spawnevent, 500)
     while run:
         #Peli rajoitetu 60fps
         clock.tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == spawnevent:
+                if len(miinat) > 0:
+                    miinat.pop()
+                randomWitdh = random.randint(0, WIDTH)
+                randomHeight = random.randint(0, HEIGHT)
+                miina = pygame.Rect(randomWitdh,randomHeight, 50,50)
+                miinat.append(miina)
+                pygame.time.set_timer(spawnevent, 500)
 
-        randomWitdh = random.randint(50, WIDTH - 50)
-        randomHeight = random.randint(50, HEIGHT - 50)
         txtHealth = font.render("HP: " + str(pelaaja1.health),True, (255,255,255))
-        if run and len(miinat) == 0:
-            lisays = threading.Thread(target=uusimiina())
-            lisays.start()
             
         pelaajarect = pygame.Rect(pelaaja1.x,pelaaja1.y, ufo.get_width(),ufo.get_height())
         handle(pelaajarect)
         draw(txtHealth)
-
+        
         if pelaaja1.health <= 0:
             run = False
+
         keys = pygame.key.get_pressed()
         # Liikkuminen
         if keys[pygame.K_RIGHT] and pelaaja1.x + ufo.get_width() < WIDTH:
