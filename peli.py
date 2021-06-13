@@ -63,7 +63,7 @@ def main():
                 sys.exit()
             if event.type == spawnevent:
                 if len(miinat) > 0:
-                    miinat.pop()
+                    miinat.remove(miinat[0])
                 randomWitdh = random.randint(0, WIDTH)
                 randomHeight = random.randint(0, HEIGHT)
                 miina = pygame.Rect(randomWitdh,randomHeight, 50,50)
@@ -93,9 +93,7 @@ def main():
         pygame.display.update()
         app.run_callbacks()
 def callback(result):
-    if result == sdk.Result.ok:
-        print("Successfully set the activity!")
-    else:
+    if result != sdk.Result.ok:
         raise Exception(result)
 
 main()
