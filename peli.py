@@ -18,7 +18,7 @@ spawnevent = pygame.USEREVENT + 1
 clock = pygame.time.Clock()
 pygame.display.set_caption("Testipeli")
 miinat = []
-app = sdk.Discord(853346441287041134, sdk.CreateFlags.default)
+app = sdk.Discord(0, sdk.CreateFlags.default)
 activity_manager = app.get_activity_manager()
 osuma = pygame.mixer.Sound("hit.wav")
 
